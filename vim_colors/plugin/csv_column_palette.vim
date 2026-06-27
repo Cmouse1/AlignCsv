@@ -1,5 +1,5 @@
-" Lightweight comma-separated column highlighter.
-" Copy this file to ~/.vim/plugin/csv_columns.vim.
+" CSV column color palette.
+" Copy this file to ~/.vim/plugin/csv_column_palette.vim.
 
 if exists('g:loaded_csv_columns')
   finish

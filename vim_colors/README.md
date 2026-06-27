@@ -2,7 +2,7 @@
 
 This package contains only the CSV column highlighting part:
 
-- `plugin/csv_columns.vim`
+- `plugin/csv_column_palette.vim`
 
 It colors comma-separated columns with a repeating palette similar to the
 screenshot. It does not change your colorscheme, background, line numbers, or
@@ -14,7 +14,7 @@ Copy the plugin into your Vim plugin directory:
 
 ```sh
 mkdir -p ~/.vim/plugin
-cp plugin/csv_columns.vim ~/.vim/plugin/
+cp plugin/csv_column_palette.vim ~/.vim/plugin/
 ```
 
 Restart Vim/GVim, then open a `.csv` file. The highlighting auto-enables for
