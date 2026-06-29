@@ -1,5 +1,9 @@
 " CSV column color palette.
 " Copy this file to ~/.vim/plugin/csv_column_palette.vim.
+"
+" Highlights columns with cycling colors (0..9 → 0..9).
+" Uses :syntax match instead of matchadd() to avoid CursorLine conflict.
+" Comma color is unified to a muted tone.
 
 if exists('g:loaded_csv_columns')
   finish
@@ -32,30 +36,63 @@ function! s:DefineDefaultHighlights() abort
   hi default CsvCol7 guifg=#e5a7d9 ctermfg=218 guibg=NONE ctermbg=NONE
   hi default CsvCol8 guifg=#b9c0ff ctermfg=147 guibg=NONE ctermbg=NONE
   hi default CsvCol9 guifg=#eeeeee ctermfg=255 guibg=NONE ctermbg=NONE
+
+  hi default CsvComma guifg=#5c5c5c ctermfg=240 guibg=NONE ctermbg=NONE
+endfunction
+
+function! s:MaxColumns() abort
+  let l:max = 0
+  let l:limit = min([line('$'), 200])
+  for l:lnum in range(1, l:limit)
+    let l:line = getline(l:lnum)
+    " Count commas — Vim 7.0 compatible, no split(,,1) needed
+    let l:commas = strlen(substitute(l:line, '[^,]', '', 'g'))
+    if l:commas > l:max
+      let l:max = l:commas
+    endif
+  endfor
+  return l:max + 1
 endfunction
 
 function! s:ClearCsvColumns() abort
+  for l:grp in g:csv_column_groups
+    execute 'syntax clear ' . l:grp
+  endfor
+  syntax clear CsvComma
+
+  " Also clear any leftover matchadd items
   if exists('w:csv_column_matches')
     for l:id in w:csv_column_matches
       silent! call matchdelete(l:id)
     endfor
+    unlet w:csv_column_matches
   endif
-  let w:csv_column_matches = []
 endfunction
 
 function! s:AddCsvColumnMatches() abort
   call s:DefineDefaultHighlights()
   call s:ClearCsvColumns()
 
-  for l:idx in range(0, len(g:csv_column_groups) - 1)
-    let l:group = g:csv_column_groups[l:idx % len(g:csv_column_groups)]
+  let l:n_groups = len(g:csv_column_groups)
+  let l:n_cols   = s:MaxColumns()
+
+  if l:n_cols <= 1
+    return
+  endif
+
+  " Define one syntax match per column position, cycling groups
+  for l:idx in range(0, l:n_cols - 1)
+    let l:group = g:csv_column_groups[l:idx % l:n_groups]
     if l:idx == 0
-      let l:pattern = '^\s*\zs[^,]*'
+      let l:pat = '^\s*\zs[^,]*'
     else
-      let l:pattern = '^\([^,]*,\)\{' . l:idx . '}\s*\zs[^,]*'
+      let l:pat = '^\([^,]*,\)\{' . l:idx . '}\s*\zs[^,]*'
     endif
-    call add(w:csv_column_matches, matchadd(l:group, l:pattern, -10))
+    execute 'syntax match ' . l:group . ' /' . l:pat . '/'
   endfor
+
+  " Unified comma highlight — no containedin (Vim 7.0 safe)
+  syntax match CsvComma /,/
 endfunction
 
 command! CsvColumns call s:AddCsvColumnMatches()
