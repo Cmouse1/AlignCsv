@@ -22,16 +22,16 @@ if !exists('g:csv_column_groups')
 endif
 
 function! s:DefineDefaultHighlights() abort
-  hi default CsvCol0 guifg=#e6e6e6 ctermfg=252
-  hi default CsvCol1 guifg=#c67800 ctermfg=172
-  hi default CsvCol2 guifg=#e5a7d9 ctermfg=218
-  hi default CsvCol3 guifg=#7fd7cf ctermfg=116
-  hi default CsvCol4 guifg=#d8a8e8 ctermfg=183
-  hi default CsvCol5 guifg=#22b8cf ctermfg=38
-  hi default CsvCol6 guifg=#c792ea ctermfg=141
-  hi default CsvCol7 guifg=#e5a7d9 ctermfg=218
-  hi default CsvCol8 guifg=#b9c0ff ctermfg=147
-  hi default CsvCol9 guifg=#eeeeee ctermfg=255
+  hi default CsvCol0 guifg=#e6e6e6 ctermfg=252 guibg=NONE ctermbg=NONE
+  hi default CsvCol1 guifg=#c67800 ctermfg=172 guibg=NONE ctermbg=NONE
+  hi default CsvCol2 guifg=#e5a7d9 ctermfg=218 guibg=NONE ctermbg=NONE
+  hi default CsvCol3 guifg=#7fd7cf ctermfg=116 guibg=NONE ctermbg=NONE
+  hi default CsvCol4 guifg=#d8a8e8 ctermfg=183 guibg=NONE ctermbg=NONE
+  hi default CsvCol5 guifg=#22b8cf ctermfg=38 guibg=NONE ctermbg=NONE
+  hi default CsvCol6 guifg=#c792ea ctermfg=141 guibg=NONE ctermbg=NONE
+  hi default CsvCol7 guifg=#e5a7d9 ctermfg=218 guibg=NONE ctermbg=NONE
+  hi default CsvCol8 guifg=#b9c0ff ctermfg=147 guibg=NONE ctermbg=NONE
+  hi default CsvCol9 guifg=#eeeeee ctermfg=255 guibg=NONE ctermbg=NONE
 endfunction
 
 function! s:ClearCsvColumns() abort
@@ -48,13 +48,13 @@ function! s:AddCsvColumnMatches() abort
   call s:ClearCsvColumns()
 
   for l:idx in range(0, len(g:csv_column_groups) - 1)
-    let l:group = g:csv_column_groups[l:idx]
+    let l:group = g:csv_column_groups[l:idx % len(g:csv_column_groups)]
     if l:idx == 0
       let l:pattern = '^\s*\zs[^,]*'
     else
       let l:pattern = '^\([^,]*,\)\{' . l:idx . '}\s*\zs[^,]*'
     endif
-    call add(w:csv_column_matches, matchadd(l:group, l:pattern, 10))
+    call add(w:csv_column_matches, matchadd(l:group, l:pattern, -10))
   endfor
 endfunction
 
