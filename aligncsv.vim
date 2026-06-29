@@ -157,7 +157,7 @@ function! s:MarkerRanges(line1, line2) abort
     let l:line = s:TrimBoth(getline(l:lnum))
 
     for l:pair in g:aligncsv_marker_pairs
-      if type(l:pair) != v:t_list || len(l:pair) < 2 || l:line !=# l:pair[0]
+      if type(l:pair) != 3 || len(l:pair) < 2 || l:line !=# l:pair[0]
         continue
       endif
 
@@ -208,11 +208,15 @@ function! s:LooseCsvRanges(line1, line2, marker_ranges) abort
   return l:ranges
 endfunction
 
+function! s:CompareRanges(a, b) abort
+  return a:a[0] == a:b[0] ? a:a[1] - a:b[1] : a:a[0] - a:b[0]
+endfunction
+
 function! s:AutoRanges(line1, line2) abort
   let l:end = s:StopLine(a:line1, a:line2)
   let l:marker_ranges = s:MarkerRanges(a:line1, l:end)
   let l:loose_ranges = s:LooseCsvRanges(a:line1, l:end, l:marker_ranges)
-  return sort(l:marker_ranges + l:loose_ranges, {a, b -> a[0] == b[0] ? a[1] - b[1] : a[0] - b[0]})
+  return sort(l:marker_ranges + l:loose_ranges, function('s:CompareRanges'))
 endfunction
 
 function! s:AlignOneRange(line1, line2) abort
