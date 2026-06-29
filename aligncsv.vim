@@ -111,7 +111,7 @@ function! s:RightAlignColumns(header_fields) abort
   return l:right_cols
 endfunction
 
-function! s:JoinAligned(fields, widths, right_cols) abort
+function! s:JoinAligned(fields, widths, right_cols, is_header) abort
   let l:out = ''
   let l:last = len(a:fields) - 1
 
@@ -119,7 +119,7 @@ function! s:JoinAligned(fields, widths, right_cols) abort
     let l:cell = s:TrimBoth(a:fields[l:col])
     if l:col == l:last
       let l:out .= l:cell
-    elseif has_key(a:right_cols, l:col)
+    elseif !a:is_header && has_key(a:right_cols, l:col)
       let l:out .= s:PadLeft(l:cell, a:widths[l:col]) . ','
     else
       let l:out .= s:PadRight(l:cell, a:widths[l:col]) . ','
@@ -236,8 +236,9 @@ function! s:AlignOneRange(line1, line2) abort
 
   let l:widths = s:FieldWidths(l:rows)
   let l:right_cols = s:RightAlignColumns(l:rows[0])
-  for l:item in l:items
-    call setline(l:item.lnum, s:JoinAligned(l:item.fields, l:widths, l:right_cols))
+  for l:idx in range(0, len(l:items) - 1)
+    let l:item = l:items[l:idx]
+    call setline(l:item.lnum, s:JoinAligned(l:item.fields, l:widths, l:right_cols, l:idx == 0))
   endfor
 endfunction
 
