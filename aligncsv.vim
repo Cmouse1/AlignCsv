@@ -273,11 +273,11 @@ function! AlignCsv(...) range abort
 endfunction
 
 function! AlignCsvCommand(range_count, line1, line2) abort
-  if a:range_count == 0
+  if a:range_count < 0
     call AlignCsv()
   else
     call AlignCsv(a:line1, a:line2)
   endif
 endfunction
 
-command! -range AlignCsv call AlignCsvCommand(<range>, <line1>, <line2>)
+command! -range AlignCsv call AlignCsvCommand(<count>, <line1>, <line2>)
